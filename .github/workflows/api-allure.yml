@@ -87,7 +87,7 @@ jobs:
         subfolder: real-setup
 
     # ------------------------------------------------------------------------
-    # UNIFIED ASSEMBLER LAYER (Builds the complete site structure in memory)
+    # FIXED UNIFIED ASSEMBLER LAYER (Corrected local path resolution)
     # ------------------------------------------------------------------------
     - name: Consolidate Subfolders & Generate Navigation Router
       if: always()
@@ -95,14 +95,18 @@ jobs:
         mkdir -p final-allure-payload/legacy
         mkdir -p final-allure-payload/real-setup
         
-        # Copy compiled static assets from their isolated staging areas
-        if [ -d "allure-report-legacy/legacy" ]; then
-          cp -r allure-report-legacy/legacy/* final-allure-payload/legacy/
+        # 🛠️ FIX: Copy files directly from the root of the generated build outputs
+        if [ -d "allure-report-legacy" ]; then
+          cp -r allure-report-legacy/* final-allure-payload/legacy/
         fi
         
-        if [ -d "allure-report-real/real-setup" ]; then
-          cp -r allure-report-real/real-setup/* final-allure-payload/real-setup/
+        if [ -d "allure-report-real" ]; then
+          cp -r allure-report-real/* final-allure-payload/real-setup/
         fi
+        
+        # Clean up accidental recursive folders if the action duplicated them
+        rm -rf final-allure-payload/legacy/legacy
+        rm -rf final-allure-payload/real-setup/real-setup
         
         # Inject the Master Hub HTML router directly into the root layout folder
         cat << 'EOF' > final-allure-payload/index.html
