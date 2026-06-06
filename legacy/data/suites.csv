@@ -1,0 +1,8 @@
+"DESCRIPTION","DURATION IN MS","NAME","PARENT SUITE","START TIME","STATUS","STOP TIME","SUB SUITE","SUITE","TEST CLASS","TEST METHOD"
+"","20","TC-003: Decline Transaction on Missing Security Credentials - Expected 401 Unauthorized","","2026-06-06","passed","2026-06-06","Enterprise Microservices Integration & Quality Gate Suite","real-setup.spec.js","",""
+"","62","TC-002: Reject Checkout Order when Stock is Deficient - Expected 400 Client Error","","2026-06-06","passed","2026-06-06","Enterprise Microservices Integration & Quality Gate Suite","real-setup.spec.js","",""
+"","708","Step 1: Authenticate and Fetch Bearer Token","","2026-06-06","passed","2026-06-06","ReqRes API E2E Management Pipeline","reqres-e2e.spec.js","",""
+"","162","Step 2: Create a New System Record","","2026-06-06","passed","2026-06-06","ReqRes API E2E Management Pipeline","reqres-e2e.spec.js","",""
+"","293","Step 3: Modify Record Information via PUT","","2026-06-06","passed","2026-06-06","ReqRes API E2E Management Pipeline","reqres-e2e.spec.js","",""
+"","56","TC-001: Process High-Value Order Checkout - Success Path","","2026-06-06","passed","2026-06-06","Enterprise Microservices Integration & Quality Gate Suite","real-setup.spec.js","",""
+"","154","Step 4: Purge System Record and Clean Environment","","2026-06-06","passed","2026-06-06","ReqRes API E2E Management Pipeline","reqres-e2e.spec.js","",""
