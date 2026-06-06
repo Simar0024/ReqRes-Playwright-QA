@@ -52,7 +52,7 @@ jobs:
       continue-on-error: true
 
     # ------------------------------------------------------------------------
-    # FIXED NATIVE SUBFOLDER COMPILATION LAYER
+    # REPORT ARCHITECTURE INTEGRATION STAGE
     # ------------------------------------------------------------------------
     - name: Load Historical Test Metrics
       uses: actions/checkout@v4
@@ -62,7 +62,7 @@ jobs:
         ref: gh-pages
         path: gh-pages-dir
 
-    # Compile Legacy Reports natively into gh-pages-dir/legacy
+    # Compile Legacy Reports into our staging area
     - name: Map Legacy Allure Structural Package
       uses: simple-elf/allure-report-action@master
       if: always()
@@ -70,11 +70,11 @@ jobs:
       with:
         allure_results: allure-results
         gh_pages: gh-pages-dir
-        allure_report: gh-pages-dir
+        allure_report: final-allure-payload
         allure_history: allure-history-legacy
         subfolder: legacy
 
-    # Compile Real-Setup Reports natively into gh-pages-dir/real-setup
+    # Compile Real-Setup Reports into our staging area
     - name: Map Real-Setup Allure Structural Package
       uses: simple-elf/allure-report-action@master
       if: always()
@@ -82,7 +82,7 @@ jobs:
       with:
         allure_results: real-setup/allure-results
         gh_pages: gh-pages-dir
-        allure_report: gh-pages-dir
+        allure_report: final-allure-payload
         allure_history: allure-history-real
         subfolder: real-setup
 
@@ -92,16 +92,19 @@ jobs:
     - name: Inject Portal Frontends and Root Router
       if: always()
       run: |
-        # 🛠️ FIX 1: Create a dedicated portal directory for your frontend web interface
-        mkdir -p gh-pages-dir/portal
+        # Fix permissions on directories created by container actions if needed
+        sudo chown -R $USER:$USER final-allure-payload
+        
+        # Create a dedicated portal directory for your frontend web interface
+        mkdir -p final-allure-payload/portal
         
         # Copy your production frontend into the deployment bundle
         if [ -d "real-setup/frontend" ]; then
-          cp -r real-setup/frontend/* gh-pages-dir/portal/
+          cp -r real-setup/frontend/* final-allure-payload/portal/
         fi
         
-        # 🛠️ FIX 2: Generate the central master router dashboard at the root level
-        cat << 'EOF' > gh-pages-dir/index.html
+        # Generate the central master router dashboard at the root level
+        cat << 'EOF' > final-allure-payload/index.html
         <!DOCTYPE html>
         <html>
         <head>
@@ -133,7 +136,7 @@ jobs:
         </html>
         EOF
         
-        touch gh-pages-dir/.nojekyll
+        touch final-allure-payload/.nojekyll
 
     # ------------------------------------------------------------------------
     # CLEAN DEPLOYMENT PUBLISHING STAGE
@@ -144,7 +147,7 @@ jobs:
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         publish_branch: gh-pages
-        publish_dir: gh-pages-dir
+        publish_dir: final-allure-payload
 
     - name: Initialize Pages Static Hosting Layer
       uses: actions/configure-pages@v5
@@ -154,7 +157,7 @@ jobs:
       uses: actions/upload-pages-artifact@v3
       if: always()
       with:
-        path: 'gh-pages-dir'
+        path: 'final-allure-payload'
 
     - name: Publish Consolidated Allure System Report Dashboard
       id: deployment
