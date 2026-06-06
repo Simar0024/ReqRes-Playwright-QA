@@ -1,45 +1,29 @@
 <!DOCTYPE html>
-<html dir="ltr" lang="en">
+<html>
 <head>
-    <meta charset="utf-8">
-    <meta name="allure-report-uuid" content="64c37006-e5c3-4942-85c7-be9a322fbcc8">
-    <title>Allure Report</title>
-    <link rel="icon" href="assets/favicon-BDLHVmV7.ico">
-    <!-- allure-core-head:start -->
-    <!-- allure-core-head:end -->
+    <title>QA Quality Gate Portal</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; text-align: center; padding: 50px; background: #f8f9fa; }
+        .container { max-width: 650px; margin: 0 auto; background: white; padding: 40px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        h1 { color: #202124; margin-bottom: 10px; }
+        h3 { color: #5f6368; font-weight: normal; margin-bottom: 30px; }
+        .btn { display: block; margin: 15px auto; padding: 15px 25px; background: #1a73e8; color: white; text-decoration: none; border-radius: 8px; font-weight: bold; width: 65%; transition: background 0.2s; box-sizing: border-box; }
+        .btn:hover { background: #1557b0; }
+        .btn-secondary { background: #34a853; }
+        .btn-secondary:hover { background: #24753a; }
+        .btn-accent { background: #ea4335; }
+        .btn-accent:hover { background: #c53929; }
+    </style>
 </head>
 <body>
-    <div id="alert"></div>
-    <div id="content">
-        <span class="spinner">
-            <span class="spinner__circle"></span>
-        </span>
+    <div class="container">
+        <h1>Infrastructure Verification Hub</h1>
+        <h3>ReqRes & Real-Setup Continuous Integration Gateway</h3>
+        <hr style="border: 0; border-top: 1px solid #eee; margin-bottom: 25px;">
+        
+        <a href="./legacy/" class="btn">📊 View Legacy ReqRes API Report</a>
+        <a href="./real-setup/" class="btn btn-secondary">🚀 View Real-Setup Test Report</a>
+        <a href="./portal/" class="btn btn-accent">💻 Launch Enterprise Order Management Portal</a>
     </div>
-    <div id="popup"></div>
-    <!-- allure-core-body:start -->
-    <script>
-        window.__allureCoreLoaded = new Promise(function (resolve, reject) {
-        window.__allureResolveCoreLoaded = resolve;
-        window.__allureRejectCoreLoaded = reject;
-    });
-    </script>
-    <script src="assets/index-DbdpUWhB.js"></script>
-    <script>
-        if (typeof window.__allureResolveCoreLoaded === "function") {
-            window.__allureResolveCoreLoaded([]);
-        }
-    </script>
-    <!-- allure-core-body:end -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-FVWC4GKEYS"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-        gtag('config', 'G-FVWC4GKEYS', {
-          'allureVersion': '2.42.0',
-          'reportUuid': '64c37006-e5c3-4942-85c7-be9a322fbcc8',
-          'single_file': false
-        });
-    </script>
 </body>
 </html>
