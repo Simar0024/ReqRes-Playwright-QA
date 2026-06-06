@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Enterprise Order Management Portal</title>
+    <style>
+        body { font-family: 'Segoe UI', Arial, sans-serif; margin: 40px; background: #f4f6f9; color: #333; }
+        .card { background: white; padding: 25px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); max-width: 500px; }
+        button { background: #0066cc; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; }
+        button:hover { background: #0052a3; }
+        .status { margin-top: 15px; padding: 10px; border-radius: 4px; display: none; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h2>Corporate Procurement Engine</h2>
+        <p>Item: <strong>Kubernetes Masterclass (ID: 102)</strong></p>
+        <button id="checkoutBtn">Trigger Automated Checkout</button>
+        <div id="statusBox" class="status"></div>
+    </div>
+
+    <script>
+        document.getElementById('checkoutBtn').addEventListener('click', async () => {
+            const statusBox = document.getElementById('statusBox');
+            try {
+                const response = await fetch('http://localhost:5000/api/v1/orders', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'x-api-key': 'prod-secret-gate-key' },
+                    body: JSON.stringify({ itemId: 102, quantity: 1, userEmail: "devops@firm.com" })
+                });
+                const data = await response.json();
+                statusBox.style.display = "block";
+                statusBox.style.background = response.ok ? "#d4edda" : "#f8d7da";
+                statusBox.innerText = JSON.stringify(data, null, 2);
+            } catch (err) {
+                console.error("Network interface error:", err);
+            }
+        });
+    </script>
+</body>
+</html>

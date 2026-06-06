@@ -1,0 +1,54 @@
+// backend/server.js
+const express = require('express');
+const app = express();
+app.use(express.json());
+
+// Mock Database State
+let inventory = [
+  { id: 101, item: "Cloud Architecture Blueprint", stock: 5, price: 49.99 },
+  { id: 102, item: "Kubernetes Masterclass", stock: 0, price: 99.99 }
+];
+
+// 1. SUCCESS CASE: Secure Order Checkout (201 Created)
+app.post('/api/v1/orders', (req, res) => {
+  const { itemId, quantity, userEmail } = req.body;
+  const apiKey = req.headers['x-api-key'];
+
+  if (!apiKey || apiKey !== 'prod-secret-gate-key') {
+    return res.status(401).json({ error: "Unauthorized", message: "Invalid or missing x-api-key header." });
+  }
+
+  const product = inventory.find(i => i.id === itemId);
+  if (!product) {
+    return res.status(404).json({ error: "Not Found", message: "Item ID does not exist in active database." });
+  }
+
+  // 2. CLIENT ERROR CASE: Out of Stock validation (400 Bad Request)
+  if (product.stock < quantity) {
+    return res.status(400).json({ 
+      error: "Bad Request", 
+      message: `Insufficient stock. Requested: ${quantity}, Available: ${product.stock}` 
+    });
+  }
+
+  product.stock -= quantity; // Mutate state
+  return res.status(201).json({
+    status: "success",
+    orderId: `ORD-${Math.floor(1000 + Math.random() * 9000)}`,
+    item: product.item,
+    totalCost: (product.price * quantity).toFixed(2)
+  });
+});
+
+// 3. SERVER ERROR CASE: Flaky Internal Legacy Synchronization Sync (500 Internal Error)
+app.get('/api/v1/sync/legacy-erp', (req, res) => {
+  // Intentional production failure simulation
+  res.status(500).json({
+    error: "InternalServerError",
+    message: "CRITICAL: Connection dropped during legacy ERP ledger database handshake.",
+    traceId: "err-99af-8821b"
+  });
+});
+
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => console.log(`🚀 Production Backend Gateway online on port ${PORT}`));
