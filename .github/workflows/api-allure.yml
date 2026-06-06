@@ -52,7 +52,7 @@ jobs:
       continue-on-error: true
 
     # ------------------------------------------------------------------------
-    # REPORT ARCHITECTURE INTEGRATION STAGE (Isolated Construction)
+    # REPORT ARCHITECTURE INTEGRATION STAGE
     # ------------------------------------------------------------------------
     - name: Load Historical Test Metrics
       uses: actions/checkout@v4
@@ -62,7 +62,7 @@ jobs:
         ref: gh-pages
         path: gh-pages-dir
 
-    # Compile Part A into its own isolated target workspace output folder
+    # Compile Part A into its own isolated temporary workspace directory
     - name: Map Legacy Allure Structural Package
       uses: simple-elf/allure-report-action@master
       if: always()
@@ -74,7 +74,7 @@ jobs:
         allure_history: allure-history-legacy
         subfolder: legacy
 
-    # Compile Part B into its own isolated target workspace output folder
+    # Compile Part B into its own isolated temporary workspace directory
     - name: Map Real-Setup Allure Structural Package
       uses: simple-elf/allure-report-action@master
       if: always()
@@ -87,15 +87,15 @@ jobs:
         subfolder: real-setup
 
     # ------------------------------------------------------------------------
-    # UNIFIED ASSEMBLER LAYER (Merges both suites together safely)
+    # UNIFIED ASSEMBLER LAYER (Builds the complete site structure in memory)
     # ------------------------------------------------------------------------
-    - name: Consolidate Subfolders into Unified Master Directory
+    - name: Consolidate Subfolders & Generate Navigation Router
       if: always()
       run: |
         mkdir -p final-allure-payload/legacy
         mkdir -p final-allure-payload/real-setup
         
-        # Copy the compiled HTML assets safely from their isolated outputs
+        # Copy compiled static assets from their isolated staging areas
         if [ -d "allure-report-legacy/legacy" ]; then
           cp -r allure-report-legacy/legacy/* final-allure-payload/legacy/
         fi
@@ -103,29 +103,9 @@ jobs:
         if [ -d "allure-report-real/real-setup" ]; then
           cp -r allure-report-real/real-setup/* final-allure-payload/real-setup/
         fi
-
-    - name: Deploy Accumulated Artifacts to gh-pages branch
-      uses: peaceiris/actions-gh-pages@v4
-      if: always()
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_branch: gh-pages
-        publish_dir: final-allure-payload
-
-    # ------------------------------------------------------------------------
-    # DEPLOYMENT ENGINE LAYER WITH HUB INDEX HUB ROUTER
-    # ------------------------------------------------------------------------
-    - name: Extract Fresh Master Payload from Branch Context
-      uses: actions/checkout@v4
-      if: always()
-      with:
-        ref: gh-pages
-        path: deployment-payload
-
-    - name: Generate Root Hub Index Router File
-      if: always()
-      run: |
-        cat << 'EOF' > deployment-payload/index.html
+        
+        # Inject the Master Hub HTML router directly into the root layout folder
+        cat << 'EOF' > final-allure-payload/index.html
         <!DOCTYPE html>
         <html>
         <head>
@@ -149,18 +129,34 @@ jobs:
         </body>
         </html>
         EOF
-        touch deployment-payload/.nojekyll
+        
+        # Standard bypass flag for GitHub Pages Jekyll processing engines
+        touch final-allure-payload/.nojekyll
 
+    # ------------------------------------------------------------------------
+    # BACKUP AND HOSTING DEPLOYMENT OPERATIONS
+    # ------------------------------------------------------------------------
+    - name: Backup Entire Consolidated Payload to gh-pages Branch
+      uses: peaceiris/actions-gh-pages@v4
+      if: always()
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_branch: gh-pages
+        publish_dir: final-allure-payload
+
+    # Setup the hosting infrastructure variables using the consolidated payload directly
     - name: Initialize Pages Static Hosting Layer
       uses: actions/configure-pages@v5
       if: always()
 
+    # Stage the clean consolidated folder to the GitHub Actions upload bundle
     - name: Stage Manifest Tarball Package to Hosting Engine
       uses: actions/upload-pages-artifact@v3
       if: always()
       with:
-        path: 'deployment-payload'
+        path: 'final-allure-payload'
 
+    # Deploy everything instantly to the web
     - name: Publish Consolidated Allure System Report Dashboard
       id: deployment
       uses: actions/deploy-pages@v4
