@@ -1,14 +1,17 @@
 {
-  "name": "playwright-reqres-allure",
+  "name": "enterprise-qa-automation-matrix",
   "version": "1.0.0",
-  "description": "",
+  "description": "Multi-Layer API Verification Pipeline",
   "main": "index.js",
+  "type": "commonjs",
   "scripts": {
-  "test": "playwright test",
-  "allure:clear": "rm -rf allure-results allure-report",
-  "allure:generate": "npx allure generate allure-results --clean -o allure-report",
-  "allure:open": "npx allure open allure-report"
-},
+    "test": "playwright test",
+    "test:legacy": "npx playwright test tests/reqres-e2e.spec.js --reporter=line,allure-playwright",
+    "test:real-setup": "npx playwright test --config=real-setup/playwright.config.js",
+    "allure:clear": "rm -rf allure-results real-setup/allure-results allure-report",
+    "allure:generate": "npx allure generate allure-results --clean -o allure-report",
+    "allure:open": "npx allure open allure-report"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Simar0024/ReqRes-Playwright-QA.git"
@@ -16,11 +19,13 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "commonjs",
   "bugs": {
     "url": "https://github.com/Simar0024/ReqRes-Playwright-QA/issues"
   },
   "homepage": "https://github.com/Simar0024/ReqRes-Playwright-QA#readme",
+  "dependencies": {
+    "express": "^4.19.2"
+  },
   "devDependencies": {
     "@playwright/test": "^1.60.0",
     "allure-commandline": "^2.42.0",

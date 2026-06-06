@@ -23,25 +23,38 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout Main Codebase
+    - name: Checkout Codebase
       uses: actions/checkout@v4
 
-    - name: Setup Node.js Runtime environment
+    - name: Setup Node.js Runtime
       uses: actions/setup-node@v4
       with:
         node-version: '20'
         cache: 'npm'
 
     - name: Install Application Dependencies
-      run: npm ci
+      run: npm install
 
-    - name: Run Playwright Integration Tests
+    # ------------------------------------------------------------------------
+    # EXECUTION STAGE 1: RUN LEGACY REQRES TESTS
+    # ------------------------------------------------------------------------
+    - name: Execute Legacy ReqRes Automated Tests
       env:
         REQRES_API_KEY: ${{ secrets.REQRES_API_KEY }}
-      run: npm run test
+      run: npm run test:legacy
       continue-on-error: true
 
-    - name: Load Existing Allure History from gh-pages
+    # ------------------------------------------------------------------------
+    # EXECUTION STAGE 2: RUN REAL-SETUP MICROSERVICE CLUSTER
+    # ------------------------------------------------------------------------
+    - name: Execute Real-Setup Production Cluster Tests
+      run: npm run test:real-setup
+      continue-on-error: true
+
+    # ------------------------------------------------------------------------
+    # REPORT ARCHITECTURE INTEGRATION STAGE
+    # ------------------------------------------------------------------------
+    - name: Load Historical Test Metrics
       uses: actions/checkout@v4
       if: always()
       continue-on-error: true
@@ -49,42 +62,56 @@ jobs:
         ref: gh-pages
         path: gh-pages-dir
 
-    - name: Build Allure Report Static Assets
+    # Compile Part A: Legacy Test Reports into 'legacy' sub-navigation panel
+    - name: Map Legacy Allure Structural Package
       uses: simple-elf/allure-report-action@master
       if: always()
-      id: allure-report
+      id: allure-legacy
       with:
         allure_results: allure-results
         gh_pages: gh-pages-dir
         allure_report: allure-report
         allure_history: allure-history
+        subfolder: legacy
 
-    - name: Commit and Push Report to gh-pages Branch
+    # Compile Part B: Real-Setup Cluster Reports into 'real-setup' sub-navigation panel
+    - name: Map Real-Setup Allure Structural Package
+      uses: simple-elf/allure-report-action@master
+      if: always()
+      id: allure-real
+      with:
+        allure_results: real-setup/allure-results
+        gh_pages: gh-pages-dir
+        allure_report: allure-report
+        allure_history: allure-history
+        subfolder: real-setup
+
+    - name: Deploy Accumulated Artifacts to gh-pages branch
       uses: peaceiris/actions-gh-pages@v4
       if: always()
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         publish_branch: gh-pages
         publish_dir: allure-report
-    
-    - name: Checkout Clean Copy of gh-pages Branch for Direct Deployment
+
+    - name: Extract Deployment Payload from Branch Context
       uses: actions/checkout@v4
       if: always()
       with:
         ref: gh-pages
         path: deployment-payload
 
-    - name: Setup GitHub Pages hosting layer
+    - name: Initialize Pages Static Hosting Layer
       uses: actions/configure-pages@v5
       if: always()
 
-    - name: Upload gh-pages Assets directly to Actions Engine
+    - name: Stage Manifest Tarball Package to Hosting Engine
       uses: actions/upload-pages-artifact@v3
       if: always()
       with:
         path: 'deployment-payload'
 
-    - name: Trigger Instant Headless Deployment
+    - name: Publish Consolidated Allure System Report Dashboard
       id: deployment
       uses: actions/deploy-pages@v4
       if: always()
