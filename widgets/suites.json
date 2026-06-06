@@ -1,1 +1,1 @@
-{"total":1,"items":[{"uid":"7ac68b9af88fad4ffccf71ce2b9bea85","name":"reqres-e2e.spec.js","statistic":{"failed":1,"broken":0,"skipped":3,"passed":0,"unknown":0,"total":4}}]}
+{"total":1,"items":[{"uid":"7ac68b9af88fad4ffccf71ce2b9bea85","name":"reqres-e2e.spec.js","statistic":{"failed":0,"broken":0,"skipped":0,"passed":4,"unknown":0,"total":4}}]}
