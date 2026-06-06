@@ -1,22 +1,45 @@
 <!DOCTYPE html>
-<html>
+<html dir="ltr" lang="en">
 <head>
-    <title>QA Quality Gate Portal</title>
-    <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; text-align: center; padding: 50px; background: #f8f9fa; }
-        .container { max-width: 600px; margin: 0 auto; background: white; padding: 40px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
-        h1 { color: #202124; margin-bottom: 30px; }
-        .btn { display: block; margin: 15px auto; padding: 15px 25px; background: #1a73e8; color: white; text-decoration: none; border-radius: 8px; font-weight: bold; width: 60%; transition: background 0.2s; }
-        .btn:hover { background: #1557b0; }
-        .btn-secondary { background: #34a853; }
-        .btn-secondary:hover { background: #24753a; }
-    </style>
+    <meta charset="utf-8">
+    <meta name="allure-report-uuid" content="64c37006-e5c3-4942-85c7-be9a322fbcc8">
+    <title>Allure Report</title>
+    <link rel="icon" href="assets/favicon-BDLHVmV7.ico">
+    <!-- allure-core-head:start -->
+    <!-- allure-core-head:end -->
 </head>
 <body>
-    <div class="container">
-        <h1>Infrastructure Verification Hub</h1>
-        <a href="./legacy/" class="btn">📊 View Legacy ReqRes API Dashboard</a>
-        <a href="./real-setup/" class="btn btn-secondary">🚀 View Real-Setup Cluster Dashboard</a>
+    <div id="alert"></div>
+    <div id="content">
+        <span class="spinner">
+            <span class="spinner__circle"></span>
+        </span>
     </div>
+    <div id="popup"></div>
+    <!-- allure-core-body:start -->
+    <script>
+        window.__allureCoreLoaded = new Promise(function (resolve, reject) {
+        window.__allureResolveCoreLoaded = resolve;
+        window.__allureRejectCoreLoaded = reject;
+    });
+    </script>
+    <script src="assets/index-DbdpUWhB.js"></script>
+    <script>
+        if (typeof window.__allureResolveCoreLoaded === "function") {
+            window.__allureResolveCoreLoaded([]);
+        }
+    </script>
+    <!-- allure-core-body:end -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-FVWC4GKEYS"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-FVWC4GKEYS', {
+          'allureVersion': '2.42.0',
+          'reportUuid': '64c37006-e5c3-4942-85c7-be9a322fbcc8',
+          'single_file': false
+        });
+    </script>
 </body>
 </html>

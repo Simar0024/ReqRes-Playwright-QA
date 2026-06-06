@@ -1,8 +1,0 @@
-"BROKEN","EPIC","FAILED","FEATURE","PASSED","SKIPPED","STORY","UNKNOWN"
-"0","Security Engineering","0","Gateway Authentication","1","0","","0"
-"0","Billing & Procurement","0","Inventory Guards","1","0","","0"
-"0","Authentication Services","0","","1","0","User Login Validation","0"
-"0","User Management Lifecycle","0","","1","0","Create Operations","0"
-"0","User Management Lifecycle","0","","1","0","Update Operations","0"
-"0","Billing & Procurement","0","Order Placement","1","0","","0"
-"0","User Management Lifecycle","0","","1","0","Delete Operations","0"
