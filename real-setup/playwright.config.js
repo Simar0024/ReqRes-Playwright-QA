@@ -12,7 +12,7 @@ module.exports = defineConfig({
   ],
 
   webServer: {
-    command: 'node real-setup/backend/server.js',
+    command: 'node backend/server.js',
     url: 'http://localhost:5000/api/v1/sync/legacy-erp',
     reuseExistingServer: !process.env.CI,
     timeout: 10000,
