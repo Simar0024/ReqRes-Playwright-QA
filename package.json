@@ -1,0 +1,26 @@
+{
+  "name": "playwright-reqres-allure",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Simar0024/ReqRes-Playwright-QA.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Simar0024/ReqRes-Playwright-QA/issues"
+  },
+  "homepage": "https://github.com/Simar0024/ReqRes-Playwright-QA#readme",
+  "devDependencies": {
+    "@playwright/test": "^1.60.0",
+    "allure-commandline": "^2.42.0",
+    "allure-playwright": "^3.9.0"
+  }
+}
