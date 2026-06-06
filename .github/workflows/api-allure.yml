@@ -52,7 +52,7 @@ jobs:
       continue-on-error: true
 
     # ------------------------------------------------------------------------
-    # REPORT ARCHITECTURE INTEGRATION STAGE
+    # REPORT ARCHITECTURE INTEGRATION STAGE (Isolated Build Dirs)
     # ------------------------------------------------------------------------
     - name: Load Historical Test Metrics
       uses: actions/checkout@v4
@@ -62,7 +62,7 @@ jobs:
         ref: gh-pages
         path: gh-pages-dir
 
-    # Compile Legacy Reports into our staging area
+    # Compile Legacy Reports inside isolated staging folder A
     - name: Map Legacy Allure Structural Package
       uses: simple-elf/allure-report-action@master
       if: always()
@@ -70,11 +70,11 @@ jobs:
       with:
         allure_results: allure-results
         gh_pages: gh-pages-dir
-        allure_report: final-allure-payload
+        allure_report: allure-stage-legacy
         allure_history: allure-history-legacy
         subfolder: legacy
 
-    # Compile Real-Setup Reports into our staging area
+    # Compile Real-Setup Reports inside isolated staging folder B
     - name: Map Real-Setup Allure Structural Package
       uses: simple-elf/allure-report-action@master
       if: always()
@@ -82,28 +82,46 @@ jobs:
       with:
         allure_results: real-setup/allure-results
         gh_pages: gh-pages-dir
-        allure_report: final-allure-payload
+        allure_report: allure-stage-real
         allure_history: allure-history-real
         subfolder: real-setup
 
     # ------------------------------------------------------------------------
-    # FRONTEND ASSET & NAVIGATION MATRIX PACKER
+    # UNIFIED ASSEMBLER MATRIX (Safe merging without permission blockages)
     # ------------------------------------------------------------------------
-    - name: Inject Portal Frontends and Root Router
+    - name: Merge Static Report Subfolders & Inject Frontend Web Portal
       if: always()
       run: |
-        # Fix permissions on directories created by container actions if needed
-        sudo chown -R $USER:$USER final-allure-payload
-        
-        # Create a dedicated portal directory for your frontend web interface
+        # Create a clean master distribution directory
+        mkdir -p final-allure-payload/legacy
+        mkdir -p final-allure-payload/real-setup
         mkdir -p final-allure-payload/portal
         
-        # Copy your production frontend into the deployment bundle
-        if [ -d "real-setup/frontend" ]; then
-          cp -r real-setup/frontend/* final-allure-payload/portal/
+        # Safely extract compiled assets out from the isolated run paths
+        if [ -d "allure-stage-legacy/legacy" ]; then
+          cp -r allure-stage-legacy/legacy/* final-allure-payload/legacy/
+        else
+          cp -r allure-stage-legacy/* final-allure-payload/legacy/ 2>/dev/null || true
         fi
         
-        # Generate the central master router dashboard at the root level
+        if [ -d "allure-stage-real/real-setup" ]; then
+          cp -r allure-stage-real/real-setup/* final-allure-payload/real-setup/
+        else
+          cp -r allure-stage-real/* final-allure-payload/real-setup/ 2>/dev/null || true
+        fi
+
+        # Remove recursive duplicates if created by the actions wrapper container
+        rm -rf final-allure-payload/legacy/legacy
+        rm -rf final-allure-payload/real-setup/real-setup
+        
+        # Move your actual client-side web portal code into the web hosting package folder
+        if [ -d "real-setup/frontend" ]; then
+          cp -r real-setup/frontend/* final-allure-payload/portal/
+        elif [ -f "index.html" ]; then
+          cp index.html final-allure-payload/portal/
+        fi
+        
+        # Build the global center routing navigation board layout
         cat << 'EOF' > final-allure-payload/index.html
         <!DOCTYPE html>
         <html>
@@ -139,7 +157,7 @@ jobs:
         touch final-allure-payload/.nojekyll
 
     # ------------------------------------------------------------------------
-    # CLEAN DEPLOYMENT PUBLISHING STAGE
+    # AUTOMATED PRODUCTION DEPLOYMENT OPERATIONS
     # ------------------------------------------------------------------------
     - name: Push Consolidated Assets to gh-pages Branch
       uses: peaceiris/actions-gh-pages@v4
