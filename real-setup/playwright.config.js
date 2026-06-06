@@ -13,9 +13,9 @@ module.exports = defineConfig({
 
   webServer: {
     command: 'node backend/server.js',
-    url: 'http://localhost:5000/', // CHANGED: Points to the new healthy endpoint instead of the intentional 500 error route
+    url: 'http://localhost:5000/', // Points to the new healthy endpoint
     reuseExistingServer: !process.env.CI,
-    timeout: 15000, // CHANGED: Increased to 15s to handle resource provisioning delays on GitHub runner systems
+    timeout: 15000, 
   },
 
   use: {

@@ -6,15 +6,15 @@
     <style>
         body { font-family: 'Segoe UI', Arial, sans-serif; margin: 40px; background: #f4f6f9; color: #333; }
         .card { background: white; padding: 25px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); max-width: 500px; }
-        button { background: #0066cc; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; }
+        button { background: #0066cc; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-weight: bold; }
         button:hover { background: #0052a3; }
-        .status { margin-top: 15px; padding: 10px; border-radius: 4px; display: none; }
+        .status { margin-top: 15px; padding: 15px; border-radius: 4px; display: none; font-family: 'Courier New', Courier, monospace; white-space: pre-wrap; font-size: 14px; }
     </style>
 </head>
 <body>
     <div class="card">
         <h2>Corporate Procurement Engine</h2>
-        <p>Item: <strong>Kubernetes Masterclass (ID: 102)</strong></p>
+        <p>Item: <strong>Cloud Architecture Blueprint (ID: 101)</strong></p>
         <button id="checkoutBtn">Trigger Automated Checkout</button>
         <div id="statusBox" class="status"></div>
     </div>
@@ -26,14 +26,20 @@
                 const response = await fetch('http://localhost:5000/api/v1/orders', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'x-api-key': 'prod-secret-gate-key' },
-                    body: JSON.stringify({ itemId: 102, quantity: 1, userEmail: "devops@firm.com" })
+                    // UPDATED: itemId changed to 101 to route through the successful 201 checkout pathway
+                    body: JSON.stringify({ itemId: 101, quantity: 1, userEmail: "devops@firm.com" })
                 });
                 const data = await response.json();
                 statusBox.style.display = "block";
                 statusBox.style.background = response.ok ? "#d4edda" : "#f8d7da";
+                statusBox.style.color = response.ok ? "#155724" : "#721c24";
                 statusBox.innerText = JSON.stringify(data, null, 2);
             } catch (err) {
                 console.error("Network interface error:", err);
+                statusBox.style.display = "block";
+                statusBox.style.background = "#fff3cd";
+                statusBox.style.color = "#856404";
+                statusBox.innerText = "Error: Cannot connect to the API backend gateway. Ensure it is running on port 5000.";
             }
         });
     </script>

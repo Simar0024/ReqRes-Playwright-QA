@@ -1,4 +1,4 @@
-// tests/enterprise-api.spec.js
+// real-setup/tests/real-setup.spec.js
 const { test, expect } = require('@playwright/test');
 const { allure } = require('allure-playwright');
 
@@ -56,18 +56,5 @@ test.describe('Enterprise Microservices Integration & Quality Gate Suite', () =>
     expect(response.status()).toBe(401);
     const body = await response.json();
     expect(body.error).toBe("Unauthorized");
-  });
-
-  test('TC-004: Sync Legacy ERP Accounting Engine - Intentional System Crash Trigger (500 Error)', async ({ request }) => {
-    allure.epic('Infrastructure & Synchronization');
-    allure.feature('ERP Bridge Ledger');
-    allure.severity('Minor');
-
-    const response = await request.get(`${config.targetUrl}/api/v1/sync/legacy-erp`);
-
-    // To show an authentic system crash inside Allure, we intentionally make an assertion 
-    // that expects a 200 OK, but the server will return a 500 Internal Error.
-    // This creates a realistic "Failed" test case inside your Allure metrics dashboard!
-    expect(response.status()).toBe(200); 
   });
 });

@@ -40,16 +40,6 @@ app.post('/api/v1/orders', (req, res) => {
   });
 });
 
-// 3. SERVER ERROR CASE: Flaky Internal Legacy Synchronization Sync (500 Internal Error)
-app.get('/api/v1/sync/legacy-erp', (req, res) => {
-  // Intentional production failure simulation
-  res.status(500).json({
-    error: "InternalServerError",
-    message: "CRITICAL: Connection dropped during legacy ERP ledger database handshake.",
-    traceId: "err-99af-8821b"
-  });
-});
-
 // ADDED: Lightweight root health-ping endpoint for Playwright's webServer boot worker
 app.get('/', (req, res) => {
   res.status(200).json({ status: "healthy" });

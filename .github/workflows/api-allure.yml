@@ -94,12 +94,45 @@ jobs:
         publish_branch: gh-pages
         publish_dir: allure-report
 
+    # ------------------------------------------------------------------------
+    # FIXED DIRECT WORKFLOW DEPLOYMENT LAYER WITH ROOT ROUTER BALANCER
+    # ------------------------------------------------------------------------
     - name: Extract Deployment Payload from Branch Context
       uses: actions/checkout@v4
       if: always()
       with:
         ref: gh-pages
         path: deployment-payload
+
+    - name: Generate Root Hub Index Router File
+      if: always()
+      run: |
+        cat << 'EOF' > deployment-payload/index.html
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>QA Quality Gate Portal</title>
+            <style>
+                body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; text-align: center; padding: 50px; background: #f8f9fa; }
+                .container { max-width: 600px; margin: 0 auto; background: white; padding: 40px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+                h1 { color: #202124; margin-bottom: 30px; }
+                .btn { display: block; margin: 15px auto; padding: 15px 25px; background: #1a73e8; color: white; text-decoration: none; border-radius: 8px; font-weight: bold; width: 60%; transition: background 0.2s; }
+                .btn:hover { background: #1557b0; }
+                .btn-secondary { background: #34a853; }
+                .btn-secondary:hover { background: #24753a; }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <h1>Infrastructure Verification Hub</h1>
+                <a href="./legacy/" class="btn">📊 View Legacy ReqRes API Dashboard</a>
+                <a href="./real-setup/" class="btn btn-secondary">🚀 View Real-Setup Cluster Dashboard</a>
+            </div>
+        </body>
+        </html>
+        EOF
+        # Add nojekyll verification parameters across the structural roots
+        touch deployment-payload/.nojekyll
 
     - name: Initialize Pages Static Hosting Layer
       uses: actions/configure-pages@v5
