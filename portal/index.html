@@ -26,18 +26,24 @@
             let TargetApiGateway = 'http://localhost:5000/api/v1/orders';
             const isGitHubPages = window.location.hostname.includes('github.io');
             
-            // 🛠️ FIX: Directing production pages sandbox to an HTTPS gateway to bypass Mixed Content restrictions
+            // 🛠️ FIX: Mapping directly to the open public user endpoint to ensure a clean 201 response on GH Pages
             if (isGitHubPages) {
                 TargetApiGateway = 'https://reqres.in/api/users'; 
             }
 
             try {
+                // Adjust headers dynamically based on environment to prevent authentication rejections
+                const customHeaders = { 'Content-Type': 'application/json' };
+                if (!isGitHubPages) {
+                    customHeaders['x-api-key'] = 'prod-secret-gate-key';
+                }
+
                 const response = await fetch(TargetApiGateway, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: customHeaders,
                     body: JSON.stringify(
                         isGitHubPages 
-                        ? { name: "Simarjit Singh", job: "DevOps SDE Engine Blueprint Purchase" }
+                        ? { name: "Simarjit Singh", job: "DevOps Engineer Blueprint Purchase" }
                         : { itemId: 101, quantity: 1, userEmail: "devops@firm.com" }
                     )
                 });
@@ -53,7 +59,7 @@
                         environment: "GitHub Pages Cloud Sandbox Gateway Mode (HTTPS Secure)",
                         orderId: `ORD-${Math.floor(1000 + Math.random() * 9000)}`,
                         item: "Cloud Architecture Blueprint (ID: 101)",
-                        meta: data
+                        gatewayResponse: data
                     }, null, 2);
                 } else {
                     statusBox.innerText = JSON.stringify(data, null, 2);
