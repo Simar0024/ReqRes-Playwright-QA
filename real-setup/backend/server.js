@@ -50,5 +50,10 @@ app.get('/api/v1/sync/legacy-erp', (req, res) => {
   });
 });
 
+// ADDED: Lightweight root health-ping endpoint for Playwright's webServer boot worker
+app.get('/', (req, res) => {
+  res.status(200).json({ status: "healthy" });
+});
+
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`🚀 Production Backend Gateway online on port ${PORT}`));
