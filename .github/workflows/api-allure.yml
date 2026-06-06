@@ -6,7 +6,7 @@ on:
   pull_request:
     branches: [ main, master ]
 
-# CRITICAL: Grant the workflow permission to write to GitHub Pages
+# Grant the workflow permission to write to GitHub Pages and contents
 permissions:
   contents: write
   pages: write
@@ -19,6 +19,35 @@ jobs:
     steps:
     - name: Checkout Repository Codebase
       uses: actions/checkout@v4
+      with:
+        fetch-depth: 0 # Fetches all history so git can inspect all remote branches
+
+    - name: Ensure gh-pages Branch Exists
+      run: |
+        git config --global user.name "github-actions[bot]"
+        git config --global user.email "github-actions[bot]@users.noreply.github.com"
+        
+        # Check if the gh-pages branch exists remotely
+        if ! git ls-remote --exit-code --heads origin gh-pages; then
+          echo "🚀 gh-pages branch not found. Creating initialization layer..."
+          
+          # Create a completely detached, clean branch
+          git checkout --orphan gh-pages
+          git rm -rf .
+          
+          # Seed a baseline file so git registers a valid commit object
+          echo "# Allure Test Reports Delivery Network" > README.md
+          git add README.md
+          git commit -m "chore: bootstrap headless gh-pages branch architecture"
+          
+          # Push the fresh branch back up to your repository
+          git push origin gh-pages
+          
+          # Navigate back to the original workflow head commit context
+          git checkout -
+        else
+          echo "✅ gh-pages branch verified on remote storage. Moving to testing sequence."
+        fi
 
     - name: Setup Node.js Runtime environment
       uses: actions/setup-node@v4
@@ -33,11 +62,12 @@ jobs:
       env:
         REQRES_API_KEY: ${{ secrets.REQRES_API_KEY }}
       run: npm run test
-      continue-on-error: true
+      continue-on-error: true # Prevents pipeline breakage if an API execution fails
 
     - name: Load Allure History (Preserves trend charts over time)
       uses: actions/checkout@v4
       if: always()
+      continue-on-error: true
       with:
         ref: gh-pages
         path: gh-pages-dir
