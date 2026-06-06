@@ -52,7 +52,7 @@ jobs:
       continue-on-error: true
 
     # ------------------------------------------------------------------------
-    # REPORT ARCHITECTURE INTEGRATION STAGE
+    # FIXED NATIVE SUBFOLDER COMPILATION LAYER
     # ------------------------------------------------------------------------
     - name: Load Historical Test Metrics
       uses: actions/checkout@v4
@@ -62,7 +62,7 @@ jobs:
         ref: gh-pages
         path: gh-pages-dir
 
-    # Compile Part A into its own isolated temporary workspace directory
+    # Compile Legacy Reports natively into gh-pages-dir/legacy
     - name: Map Legacy Allure Structural Package
       uses: simple-elf/allure-report-action@master
       if: always()
@@ -70,11 +70,11 @@ jobs:
       with:
         allure_results: allure-results
         gh_pages: gh-pages-dir
-        allure_report: allure-report-legacy
+        allure_report: gh-pages-dir
         allure_history: allure-history-legacy
         subfolder: legacy
 
-    # Compile Part B into its own isolated temporary workspace directory
+    # Compile Real-Setup Reports natively into gh-pages-dir/real-setup
     - name: Map Real-Setup Allure Structural Package
       uses: simple-elf/allure-report-action@master
       if: always()
@@ -82,85 +82,80 @@ jobs:
       with:
         allure_results: real-setup/allure-results
         gh_pages: gh-pages-dir
-        allure_report: allure-report-real
+        allure_report: gh-pages-dir
         allure_history: allure-history-real
         subfolder: real-setup
 
     # ------------------------------------------------------------------------
-    # FIXED UNIFIED ASSEMBLER LAYER (Corrected local path resolution)
+    # FRONTEND ASSET & NAVIGATION MATRIX PACKER
     # ------------------------------------------------------------------------
-    - name: Consolidate Subfolders & Generate Navigation Router
+    - name: Inject Portal Frontends and Root Router
       if: always()
       run: |
-        mkdir -p final-allure-payload/legacy
-        mkdir -p final-allure-payload/real-setup
+        # 🛠️ FIX 1: Create a dedicated portal directory for your frontend web interface
+        mkdir -p gh-pages-dir/portal
         
-        # 🛠️ FIX: Copy files directly from the root of the generated build outputs
-        if [ -d "allure-report-legacy" ]; then
-          cp -r allure-report-legacy/* final-allure-payload/legacy/
+        # Copy your production frontend into the deployment bundle
+        if [ -d "real-setup/frontend" ]; then
+          cp -r real-setup/frontend/* gh-pages-dir/portal/
         fi
         
-        if [ -d "allure-report-real" ]; then
-          cp -r allure-report-real/* final-allure-payload/real-setup/
-        fi
-        
-        # Clean up accidental recursive folders if the action duplicated them
-        rm -rf final-allure-payload/legacy/legacy
-        rm -rf final-allure-payload/real-setup/real-setup
-        
-        # Inject the Master Hub HTML router directly into the root layout folder
-        cat << 'EOF' > final-allure-payload/index.html
+        # 🛠️ FIX 2: Generate the central master router dashboard at the root level
+        cat << 'EOF' > gh-pages-dir/index.html
         <!DOCTYPE html>
         <html>
         <head>
             <title>QA Quality Gate Portal</title>
             <style>
                 body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; text-align: center; padding: 50px; background: #f8f9fa; }
-                .container { max-width: 600px; margin: 0 auto; background: white; padding: 40px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
-                h1 { color: #202124; margin-bottom: 30px; }
-                .btn { display: block; margin: 15px auto; padding: 15px 25px; background: #1a73e8; color: white; text-decoration: none; border-radius: 8px; font-weight: bold; width: 60%; transition: background 0.2s; }
+                .container { max-width: 650px; margin: 0 auto; background: white; padding: 40px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+                h1 { color: #202124; margin-bottom: 10px; }
+                h3 { color: #5f6368; font-weight: normal; margin-bottom: 30px; }
+                .btn { display: block; margin: 15px auto; padding: 15px 25px; background: #1a73e8; color: white; text-decoration: none; border-radius: 8px; font-weight: bold; width: 65%; transition: background 0.2s; box-sizing: border-box; }
                 .btn:hover { background: #1557b0; }
                 .btn-secondary { background: #34a853; }
                 .btn-secondary:hover { background: #24753a; }
+                .btn-accent { background: #ea4335; }
+                .btn-accent:hover { background: #c53929; }
             </style>
         </head>
         <body>
             <div class="container">
                 <h1>Infrastructure Verification Hub</h1>
-                <a href="./legacy/" class="btn">📊 View Legacy ReqRes API Dashboard</a>
-                <a href="./real-setup/" class="btn btn-secondary">🚀 View Real-Setup Cluster Dashboard</a>
+                <h3>ReqRes & Real-Setup Continuous Integration Gateway</h3>
+                <hr style="border: 0; border-top: 1px solid #eee; margin-bottom: 25px;">
+                
+                <a href="./legacy/" class="btn">📊 View Legacy ReqRes API Report</a>
+                <a href="./real-setup/" class="btn btn-secondary">🚀 View Real-Setup Test Report</a>
+                <a href="./portal/" class="btn btn-accent">💻 Launch Enterprise Order Management Portal</a>
             </div>
         </body>
         </html>
         EOF
         
-        # Standard bypass flag for GitHub Pages Jekyll processing engines
-        touch final-allure-payload/.nojekyll
+        touch gh-pages-dir/.nojekyll
 
     # ------------------------------------------------------------------------
-    # BACKUP AND HOSTING DEPLOYMENT OPERATIONS
+    # CLEAN DEPLOYMENT PUBLISHING STAGE
     # ------------------------------------------------------------------------
-    - name: Backup Entire Consolidated Payload to gh-pages Branch
+    - name: Push Consolidated Assets to gh-pages Branch
       uses: peaceiris/actions-gh-pages@v4
       if: always()
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         publish_branch: gh-pages
-        publish_dir: final-allure-payload
+        publish_dir: gh-pages-dir
 
-    # Setup the hosting infrastructure variables using the consolidated payload directly
     - name: Initialize Pages Static Hosting Layer
       uses: actions/configure-pages@v5
       if: always()
 
-    # Stage the clean consolidated folder to the GitHub Actions upload bundle
     - name: Stage Manifest Tarball Package to Hosting Engine
       uses: actions/upload-pages-artifact@v3
       if: always()
       with:
-        path: 'final-allure-payload'
+        path: 'gh-pages-dir'
 
-    # Deploy everything instantly to the web
     - name: Publish Consolidated Allure System Report Dashboard
       id: deployment
       uses: actions/deploy-pages@v4
