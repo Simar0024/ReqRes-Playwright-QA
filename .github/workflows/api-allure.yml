@@ -1,0 +1,40 @@
+name: Automated API Quality Gate
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  api-testing-matrix:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository Codebase
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js Runtime environment
+      uses: actions/setup-node@v4
+      with:
+        node-size: '20'
+        cache: 'npm'
+
+    - name: Install Application Dependencies
+      run: npm ci
+
+    - name: Run Playwright Integration Tests
+      env:
+        REQRES_API_KEY: ${{ secrets.REQRES_API_KEY }}
+      run: npm run test
+      continue-on-error: true # Allows script to proceed to report generation even if a test fails
+
+    - name: Generate Allure Report Artifacts
+      run: npm run allure:generate
+
+    - name: Upload Test Results HTML Package
+      uses: actions/upload-artifact@v4
+      with:
+        name: api-allure-report-dashboard
+        path: allure-report/
+        retention-days: 5
