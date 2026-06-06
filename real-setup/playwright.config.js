@@ -1,4 +1,4 @@
-// real-setup/playwright-real.config.js
+// real-setup/playwright.config.js
 const { defineConfig } = require('@playwright/test');
 
 module.exports = defineConfig({
@@ -9,7 +9,7 @@ module.exports = defineConfig({
 
   reporter: [
     ['line'],
-    // 🛠️ FIX: Forces the reporter to isolate results in a designated subdirectory path
+    // 🛠️ FIX: Directs results to the isolated real-setup subfolder to prevent root directory clobbering
     ['allure-playwright', { outputFolder: 'real-setup/allure-results' }]
   ],
 
