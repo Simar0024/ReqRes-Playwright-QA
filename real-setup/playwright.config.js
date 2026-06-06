@@ -21,6 +21,11 @@ module.exports = defineConfig({
   },
 
   use: {
-    extraHTTPHeaders: { 'Accept': 'application/json' },
+   extraHTTPHeaders: {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+      // Dynamic fallback: reads locally via environment variables, or defaults blank
+      'x-api-key': process.env.REQRES_API_KEY || '', 
+    },
   },
 });
