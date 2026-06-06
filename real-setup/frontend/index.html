@@ -23,20 +23,18 @@
         document.getElementById('checkoutBtn').addEventListener('click', async () => {
             const statusBox = document.getElementById('statusBox');
             
-            // Primary local development cluster link
             let TargetApiGateway = 'http://localhost:5000/api/v1/orders';
+            const isGitHubPages = window.location.hostname.includes('github.io');
             
-            // Smart Cloud Environment Routing Check
-            if (window.location.hostname.includes('github.io')) {
-                // Redirect traffic cleanly to a reliable cloud sandbox mirror gateway for client side demonstration
+            // 🛠️ FIX: Directing production pages sandbox to an HTTPS gateway to bypass Mixed Content restrictions
+            if (isGitHubPages) {
                 TargetApiGateway = 'https://reqres.in/api/users'; 
             }
 
             try {
-                const isGitHubPages = window.location.hostname.includes('github.io');
                 const response = await fetch(TargetApiGateway, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'x-api-key': 'prod-secret-gate-key' },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(
                         isGitHubPages 
                         ? { name: "Simarjit Singh", job: "DevOps SDE Engine Blueprint Purchase" }
@@ -50,10 +48,9 @@
                 statusBox.style.color = response.ok ? "#155724" : "#721c24";
                 
                 if (isGitHubPages) {
-                    // Prettify the static cloud response payload metrics
                     statusBox.innerText = JSON.stringify({
                         status: "success",
-                        environment: "GitHub Pages Cloud Sandbox Gateway Mode",
+                        environment: "GitHub Pages Cloud Sandbox Gateway Mode (HTTPS Secure)",
                         orderId: `ORD-${Math.floor(1000 + Math.random() * 9000)}`,
                         item: "Cloud Architecture Blueprint (ID: 101)",
                         meta: data
@@ -66,7 +63,7 @@
                 statusBox.style.display = "block";
                 statusBox.style.background = "#fff3cd";
                 statusBox.style.color = "#856404";
-                statusBox.innerText = "Error: Cannot connect to the API backend gateway. Ensure it is running on port 5000.";
+                statusBox.innerText = "Error: Cannot connect to the API backend gateway.\nLocal Mode: Ensure node server.js is active on port 5000.\nCloud Mode: Check browser console tracking logs.";
             }
         });
     </script>
