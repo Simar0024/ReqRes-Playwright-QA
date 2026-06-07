@@ -3,7 +3,7 @@ const { defineConfig } = require('@playwright/test');
 const path = require('path');
 
 module.exports = defineConfig({
-  // 🛠️ FIX: Explicitly direct Playwright to search inside the subfolder's test directory
+  // 🛠️ Directs Playwright strictly to your subfolder test cases
   testDir: path.resolve(__dirname, 'tests'),
   fullyParallel: true,
   retries: 0,
@@ -11,18 +11,24 @@ module.exports = defineConfig({
 
   reporter: [
     ['line'],
-    // 🛠️ FIX: Forces results into the subfolder so your GitHub Actions CI step can read it safely
+    // 🛠️ Forces raw report data into the folder tracked by your workflow configuration
     ['allure-playwright', { outputFolder: path.resolve(__dirname, 'allure-results') }]
   ],
 
   webServer: {
-    command: 'node real-setup/backend/server.js', // Adjusted runtime path for root execution context
-    url: 'http://localhost:5000/',
+    // 🛠️ FIX: Clean path target execution using explicit folder transitions
+    command: 'cd real-setup && node backend/server.js',
+    url: 'http://localhost:5000/api/v1/orders', // Pings an active endpoint route for a reliable container readiness check
     reuseExistingServer: !process.env.CI,
-    timeout: 15000, 
+    timeout: 30000, 
   },
 
   use: {
-    extraHTTPHeaders: { 'Accept': 'application/json' },
+    // 🛠️ FIX: Directs your automated tests to use the correct validation key expected by your local backend server
+    extraHTTPHeaders: {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+      'x-api-key': 'prod-secret-gate-key'
+    },
   },
 });
