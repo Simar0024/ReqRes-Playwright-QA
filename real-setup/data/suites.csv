@@ -1,4 +1,4 @@
 "DESCRIPTION","DURATION IN MS","NAME","PARENT SUITE","START TIME","STATUS","STOP TIME","SUB SUITE","SUITE","TEST CLASS","TEST METHOD"
-"","12","TC-003: Decline Transaction on Missing Security Credentials - Expected 401 Unauthorized","","2026-06-07","passed","2026-06-07","Enterprise Microservices Integration & Quality Gate Suite","real-setup.spec.js","",""
-"","43","TC-002: Reject Checkout Order when Stock is Deficient - Expected 400 Client Error","","2026-06-07","passed","2026-06-07","Enterprise Microservices Integration & Quality Gate Suite","real-setup.spec.js","",""
-"","46","TC-001: Process High-Value Order Checkout - Success Path","","2026-06-07","passed","2026-06-07","Enterprise Microservices Integration & Quality Gate Suite","real-setup.spec.js","",""
+"","9","TC-003: Decline Transaction on Missing Security Credentials - Expected 401 Unauthorized","","2026-06-07","passed","2026-06-07","Enterprise Microservices Integration & Quality Gate Suite","real-setup.spec.js","",""
+"","40","TC-002: Reject Checkout Order when Stock is Deficient - Expected 400 Client Error","","2026-06-07","passed","2026-06-07","Enterprise Microservices Integration & Quality Gate Suite","real-setup.spec.js","",""
+"","38","TC-001: Process High-Value Order Checkout - Success Path","","2026-06-07","passed","2026-06-07","Enterprise Microservices Integration & Quality Gate Suite","real-setup.spec.js","",""
