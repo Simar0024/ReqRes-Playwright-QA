@@ -4,30 +4,32 @@ const app = express();
 
 app.use(express.json());
 
-// 🛠️ FIX: Explicit CORS middleware to allow your GitHub Pages portal to reach this gateway securely
+// Explicit CORS implementation allowing incoming headers from cross-origin static hosts
 app.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, x-api-key, Accept');
   
-  // Handle Preflight Options request immediately before it hits endpoints
   if (req.method === 'OPTIONS') {
     return res.sendStatus(200);
   }
   next();
 });
 
-// Mock Database State
+// Mock Database State - Expanded with Additional Catalog Entries
 let inventory = [
   { id: 101, item: "Cloud Architecture Blueprint", stock: 5, price: 49.99 },
-  { id: 102, item: "Kubernetes Masterclass", stock: 0, price: 99.99 }
+  { id: 102, item: "Kubernetes Masterclass", stock: 0, price: 99.99 },
+  { id: 103, item: "Terraform Multi-Cloud Matrix", stock: 12, price: 79.50 },
+  { id: 104, item: "AI/ML Model Pipeline Cluster", stock: 3, price: 149.00 }
 ];
 
-// 1. SUCCESS CASE: Secure Order Checkout (201 Created)
+// 1. SECURE ORDER CHECKOUT CHANNEL (POST)
 app.post('/api/v1/orders', (req, res) => {
   const { itemId, quantity, userEmail } = req.body;
   const apiKey = req.headers['x-api-key'];
 
+  // Verification security barrier
   if (!apiKey || apiKey !== 'prod-secret-gate-key') {
     return res.status(401).json({ error: "Unauthorized", message: "Invalid or missing x-api-key header." });
   }
@@ -37,7 +39,7 @@ app.post('/api/v1/orders', (req, res) => {
     return res.status(404).json({ error: "Not Found", message: "Item ID does not exist in active database." });
   }
 
-  // 2. CLIENT ERROR CASE: Out of Stock validation (400 Bad Request)
+  // Inventory validation checks
   if (product.stock < quantity) {
     return res.status(400).json({ 
       error: "Bad Request", 
@@ -45,18 +47,20 @@ app.post('/api/v1/orders', (req, res) => {
     });
   }
 
-  product.stock -= quantity; // Mutate state
+  // Mutate database transaction records state
+  product.stock -= quantity; 
   return res.status(201).json({
     status: "success",
     orderId: `ORD-${Math.floor(1000 + Math.random() * 9000)}`,
     item: product.item,
-    totalCost: (product.price * quantity).toFixed(2)
+    totalCost: (product.price * quantity).toFixed(2),
+    remainingStock: product.stock
   });
 });
 
-// Lightweight root health-ping endpoint for Playwright's webServer boot worker
+// Lightweight root health-ping endpoint for automated environment verification tasks
 app.get('/', (req, res) => {
-  res.status(200).json({ status: "healthy", service: "real-setup-cluster" });
+  res.status(200).json({ status: "healthy", service: "real-setup-cluster", activeCatalogItems: inventory.length });
 });
 
 const PORT = process.env.PORT || 5000;
