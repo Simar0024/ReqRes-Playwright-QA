@@ -26,18 +26,21 @@
             let TargetApiGateway = 'http://localhost:5000/api/v1/orders';
             const isGitHubPages = window.location.hostname.includes('github.io');
             
-            // 🛠️ FIX: Route to an open testing resource to avoid authentication errors on GitHub Pages
             if (isGitHubPages) {
                 TargetApiGateway = 'https://reqres.in/api/users/2'; 
             }
 
             try {
-                const customHeaders = { 'Content-Type': 'application/json' };
+                const customHeaders = { 
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                };
+                
+                // 🛠️ FIX: Apply the secret validation token ONLY when targeting your local cluster backend
                 if (!isGitHubPages) {
                     customHeaders['x-api-key'] = 'prod-secret-gate-key';
                 }
 
-                // Use PUT for the cloud fallback mirror channel to satisfy sandbox guidelines smoothly
                 const methodType = isGitHubPages ? 'PUT' : 'POST';
 
                 const response = await fetch(TargetApiGateway, {
