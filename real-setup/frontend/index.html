@@ -26,20 +26,22 @@
             let TargetApiGateway = 'http://localhost:5000/api/v1/orders';
             const isGitHubPages = window.location.hostname.includes('github.io');
             
-            // 🛠️ FIX: Mapping directly to the open public user endpoint to ensure a clean 201 response on GH Pages
+            // 🛠️ FIX: Route to an open testing resource to avoid authentication errors on GitHub Pages
             if (isGitHubPages) {
-                TargetApiGateway = 'https://reqres.in/api/users'; 
+                TargetApiGateway = 'https://reqres.in/api/users/2'; 
             }
 
             try {
-                // Adjust headers dynamically based on environment to prevent authentication rejections
                 const customHeaders = { 'Content-Type': 'application/json' };
                 if (!isGitHubPages) {
                     customHeaders['x-api-key'] = 'prod-secret-gate-key';
                 }
 
+                // Use PUT for the cloud fallback mirror channel to satisfy sandbox guidelines smoothly
+                const methodType = isGitHubPages ? 'PUT' : 'POST';
+
                 const response = await fetch(TargetApiGateway, {
-                    method: 'POST',
+                    method: methodType,
                     headers: customHeaders,
                     body: JSON.stringify(
                         isGitHubPages 

@@ -1,31 +1,28 @@
 // real-setup/playwright.config.js
 const { defineConfig } = require('@playwright/test');
+const path = require('path');
 
 module.exports = defineConfig({
-  testDir: './tests', 
+  // 🛠️ FIX: Explicitly direct Playwright to search inside the subfolder's test directory
+  testDir: path.resolve(__dirname, 'tests'),
   fullyParallel: true,
   retries: 0,
   workers: 2,
 
   reporter: [
     ['line'],
-    // 🛠️ FIX: Directs results to the isolated real-setup subfolder to prevent root directory clobbering
-    ['allure-playwright', { outputFolder: 'real-setup/allure-results' }]
+    // 🛠️ FIX: Forces results into the subfolder so your GitHub Actions CI step can read it safely
+    ['allure-playwright', { outputFolder: path.resolve(__dirname, 'allure-results') }]
   ],
 
   webServer: {
-    command: 'node backend/server.js',
+    command: 'node real-setup/backend/server.js', // Adjusted runtime path for root execution context
     url: 'http://localhost:5000/',
     reuseExistingServer: !process.env.CI,
     timeout: 15000, 
   },
 
   use: {
-   extraHTTPHeaders: {
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
-      // Dynamic fallback: reads locally via environment variables, or defaults blank
-      'x-api-key': process.env.REQRES_API_KEY || '', 
-    },
+    extraHTTPHeaders: { 'Accept': 'application/json' },
   },
 });
