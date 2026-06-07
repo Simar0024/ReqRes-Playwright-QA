@@ -26,31 +26,27 @@
             let TargetApiGateway = 'http://localhost:5000/api/v1/orders';
             const isGitHubPages = window.location.hostname.includes('github.io');
             
+            // 🛠️ FIX: Targets the public users collection stream via GET fallback method for safe asset rendering
             if (isGitHubPages) {
-                TargetApiGateway = 'https://reqres.in/api/users/2'; 
+                TargetApiGateway = 'https://reqres.in/api/users?page=2'; 
             }
 
             try {
-                const customHeaders = { 
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                };
+                const customHeaders = { 'Accept': 'application/json' };
                 
-                // 🛠️ FIX: Apply the secret validation token ONLY when targeting your local cluster backend
                 if (!isGitHubPages) {
+                    customHeaders['Content-Type'] = 'application/json';
                     customHeaders['x-api-key'] = 'prod-secret-gate-key';
                 }
 
-                const methodType = isGitHubPages ? 'PUT' : 'POST';
+                // 🛠️ FIX: Uses GET method for cloud sandbox fallback mode to ensure public validation success
+                const methodType = isGitHubPages ? 'GET' : 'POST';
+                const requestBody = isGitHubPages ? null : JSON.stringify({ itemId: 101, quantity: 1, userEmail: "devops@firm.com" });
 
                 const response = await fetch(TargetApiGateway, {
                     method: methodType,
                     headers: customHeaders,
-                    body: JSON.stringify(
-                        isGitHubPages 
-                        ? { name: "Simarjit Singh", job: "DevOps Engineer Blueprint Purchase" }
-                        : { itemId: 101, quantity: 1, userEmail: "devops@firm.com" }
-                    )
+                    body: requestBody
                 });
                 
                 const data = await response.json();

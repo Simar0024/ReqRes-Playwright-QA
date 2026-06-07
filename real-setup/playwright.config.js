@@ -1,34 +1,31 @@
 // real-setup/playwright.config.js
 const { defineConfig } = require('@playwright/test');
-const path = require('path');
 
 module.exports = defineConfig({
-  // Directs Playwright strictly to your subfolder test cases
-  testDir: path.resolve(__dirname, 'tests'),
+  // Playwright now runs directly inside real-setup/, so ./tests maps perfectly!
+  testDir: './tests',
   fullyParallel: true,
   retries: 0,
   workers: 2,
 
   reporter: [
     ['line'],
-    // Forces raw report data into the folder tracked by your workflow configuration
-    ['allure-playwright', { outputFolder: path.resolve(__dirname, 'allure-results') }]
+    // Places results clearly inside real-setup/allure-results for your CI action pipeline
+    ['allure-playwright', { outputFolder: 'allure-results' }]
   ],
 
   webServer: {
-    // 🛠️ FIX: Playwright is already in the real-setup folder context, run the script directly!
     command: 'node backend/server.js',
-    url: 'http://localhost:5000/api/v1/orders', // Reliable readiness health check endpoint
+    url: 'http://localhost:5000', // Ping the base URL path instead of a sub-route to prevent early 401/404 startup drops
     reuseExistingServer: !process.env.CI,
     timeout: 30000, 
   },
 
   use: {
-    // Directs your automated tests to use the correct validation key expected by your local backend server
     extraHTTPHeaders: {
       'Content-Type': 'application/json',
       'Accept': 'application/json',
-      'x-api-key': 'prod-secret-gate-key'
+      'x-api-key': 'prod-secret-gate-key' // Matches the validation header key of your local backend server script
     },
   },
 });

@@ -1,7 +1,21 @@
-// backend/server.js
+// real-setup/backend/server.js
 const express = require('express');
 const app = express();
+
 app.use(express.json());
+
+// 🛠️ FIX: Explicit CORS middleware to allow your GitHub Pages portal to reach this gateway securely
+app.use((req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, x-api-key, Accept');
+  
+  // Handle Preflight Options request immediately before it hits endpoints
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(200);
+  }
+  next();
+});
 
 // Mock Database State
 let inventory = [
@@ -40,9 +54,9 @@ app.post('/api/v1/orders', (req, res) => {
   });
 });
 
-// ADDED: Lightweight root health-ping endpoint for Playwright's webServer boot worker
+// Lightweight root health-ping endpoint for Playwright's webServer boot worker
 app.get('/', (req, res) => {
-  res.status(200).json({ status: "healthy" });
+  res.status(200).json({ status: "healthy", service: "real-setup-cluster" });
 });
 
 const PORT = process.env.PORT || 5000;
